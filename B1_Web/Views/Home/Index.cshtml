@@ -1,0 +1,114 @@
+﻿@model IndexViewModel
+@{
+    ViewData["Title"] = "Home Page";
+    int num = 1;
+    int lastBusinessId = 0;
+}
+
+<form asp-controller="Home" asp-action="Index" method="post" enctype="multipart/form-data">
+    <input type="file" name="file" class="button"/>
+    <hr/>
+    <button type="submit" class="button">Upload</button>
+</form>
+
+@if (Model.FileNames.Count() > 0)
+{
+
+    <hr/>
+    <table class="table table-hover">
+        <tr>
+            <td>№</td>
+            <td>Имя</td>
+        </tr>
+        <tbody>
+            @foreach(var item in Model.FileNames)
+            {
+                <tr>
+                    <td>@num</td>
+                    <td><a asp-controller="Home" asp-action="Index" asp-route-fileName="@item">@item</a></td>
+                </tr>
+                num++;
+            }
+        </tbody>
+    </table>
+}
+
+@if (Model.DataFileModel != null)
+{
+    <a asp-controller="Home" asp-action="SaveFile" asp-route-fileName=@Model.DataFileModel.FileName>Скачать</a>
+    <table class="table table-hover">
+        <tr>
+            <td colspan ="7" align="center">Оборотная ведомость по балансовым счетам</td>
+        </tr>
+        <tr>
+            <td colspan="7" align="center">За период с хх.хх.хххх по хх.хх.хххх</td>
+        </tr>
+        <tr>
+            <td colspan="7" align="center">По банку</td>
+        </tr>
+        <tr>
+            <td rowspan="2">Б/сч</td>
+            <td colspan="2">Входящее сальдо</td>
+            <td colspan="2">Обороты</td>
+            <td colspan="2">Исходящее сальдо</td>
+        </tr>
+        <tr>
+            <td>Актив</td>
+            <td>Пассив</td>
+            <td>Дебет</td>
+            <td>Кредит</td>
+            <td>Актив</td>
+            <td>Пассив</td>
+        </tr>
+        <tbody>
+        @foreach (var modelClass in Model.DataFileModel.Classes)
+        {
+            <tr>
+                <td align="center" colspan="7"><b>Класс №@modelClass.ClassId @modelClass.Name</b></td>
+            </tr>
+            @foreach (var modelGroup in modelClass.Groups)
+            {
+                @foreach (var modelRow in modelGroup.Rows)
+                {
+                    <tr>
+                        <td>@modelRow.BalanceId</td>
+                        <td>@modelRow.IncomingBalanceActive</td>
+                        <td>@modelRow.IncomingBalancePassive</td>
+                        <td>@modelRow.TurnoverDebit</td>
+                        <td>@modelRow.TurnoverCredit</td>
+                        <td>@modelRow.OutgoingBalanceActive</td>
+                        <td>@modelRow.OutgoingBalancePassive</td>
+                    </tr>
+                }
+                <tr>
+                    <td><b>@modelGroup.GroupId</b></td>
+                    <td><b>@modelGroup.IncomingBalanceActiveSum</b></td>
+                    <td><b>@modelGroup.IncomingBalancePassiveSum</b></td>
+                    <td><b>@modelGroup.TurnoverDebitSum</b></td>
+                    <td><b>@modelGroup.TurnoverCreditSum</b></td>
+                    <td><b>@modelGroup.OutgoingBalanceActiveSum</b></td>
+                    <td><b>@modelGroup.OutgoingBalancePassiveSum</b></td>
+                </tr>
+            }
+            <tr>
+                <td>По классу</td>
+                <td>@modelClass.IncomingBalanceActiveClassSum</td>
+                <td>@modelClass.IncomingBalancePassiveClassSum</td>
+                <td>@modelClass.TurnoverDebitClassSum</td>
+                <td>@modelClass.TurnoverCreditClassSum</td>
+                <td>@modelClass.OutgoingBalanceActiveClassSum</td>
+                <td>@modelClass.OutgoingBalancePassiveClassSum</td>
+            </tr>
+        }
+        <tr>
+            <td>Баланс</td>
+            <td>@Model.DataFileModel.IncomingBalanceActiveFileSum</td>
+            <td>@Model.DataFileModel.IncomingBalancePassiveFileSum</td>
+            <td>@Model.DataFileModel.TurnoverDebitFileSum</td>
+            <td>@Model.DataFileModel.TurnoverCreditFileSum</td>
+            <td>@Model.DataFileModel.OutgoingBalanceActiveFileSum</td>
+            <td>@Model.DataFileModel.OutgoingBalancePassiveFileSum</td>
+        </tr>
+        </tbody>
+    </table>
+}
